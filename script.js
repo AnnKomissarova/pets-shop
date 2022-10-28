@@ -84,3 +84,76 @@ const items = [
     img: "./img/12.jpeg",
   },
 ];
+
+
+let actualStatus = [...items];
+
+const itemsContainer = document.querySelector("#shop-items");
+const itemTemplate = document.querySelector("#item-template");
+const nothingFound = document.querySelector("#nothing-found");
+
+function renderItems(arr) {
+  nothingFound.textContent = "";
+  itemsContainer.innerHTML = "";
+
+  arr.forEach((item) => {
+    itemsContainer.append(doShopItem(item));
+  });
+  
+  if (!arr.length) {
+    nothingFound.textContent = "Ничего не найдено";
+  }
+}
+
+function sortByAlphabet(a, b) {
+  if (a.title > b.title) {
+    return 1;
+  }
+ 
+  if (a.title < b.title) {
+    return -1;
+  }
+  
+  return 0;
+}
+
+renderItems(actualStatus.sort((a, b) => sortByAlphabet(a, b)));
+
+function doShopItem(shopItem) {
+  const { title, description, tags, price,  img} = shopItem;
+  const item = itemTemplate.content.cloneNode(true); 
+
+  item.querySelector("h1").textContent = title;
+  item.querySelector("p").textContent = description;
+  item.querySelector(".price").textContent = `${price}P`;
+  item.querySelector("img").src = img;
+  
+  const tagsHolder = item.querySelector(".tags");
+
+  tags.forEach((tag) => {
+    const element = document.createElement("span");
+    element.textContent = tag;
+    element.classList.add("tag");
+    tagsHolder.append(element);
+});
+
+  return item;
+}
+
+const searchInput = document.querySelector("#search-input");
+const searchButton = document.querySelector("#search-btn");
+
+function useSearch() {
+  const searchString = searchInput.value.trim().toLowerCase();
+
+  actualStatus = items.filter((el) =>
+    el.title.toLowerCase().includes(searchString)
+  );
+ 
+  actualStatus.sort((a, b) => sortByAlphabet(a, b));  
+  renderItems(actualStatus);  
+  sortControl.selectedIndex = 0;
+}
+
+searchButton.addEventListener("click", useSearch);
+searchInput.addEventListener("search", useSearch);
